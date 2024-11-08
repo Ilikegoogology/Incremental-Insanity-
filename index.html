@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Incremental Insanity</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+    }
+    #realities {
+      font-size: 3em;
+    }
+    .upgrade-button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Incremental Insanity</h1>
+
+  <div id="realities">0.01</div>
+  <div>Realities per Second: <span id="rps">0</span></div>
+
+  <div id="dots-container">
+    <h2>Dots</h2>
+    <div>Dots: <span id="dots">0</span></div>
+    <div>Dots Boost: <span id="dotBoost">1</span></div>
+  </div>
+
+  <button class="upgrade-button" id="boostRealities">Boost Realities (15)</button>
+
+  <script>
+    // Game Variables
+    let realities = 0.01;
+    let realitiesPerSecond = 0;
+    let dots = 0;
+    let dotBoost = 1;
+
+    // Upgrade Costs
+    const upgradeCosts = {
+      "boostRealities": 15,
+    };
+
+    // UI Elements
+    const realitiesDisplay = document.getElementById("realities");
+    const rpsDisplay = document.getElementById("rps");
+    const dotsDisplay = document.getElementById("dots");
+    const dotBoostDisplay = document.getElementById("dotBoost");
+    const boostRealitiesButton = document.getElementById("boostRealities");
+
+    // Game Loop (runs every 1ms)
+    setInterval(() => {
+      // Generate Realities
+      realities += 0.01;
+      realitiesPerSecond = realities * 1000;
+
+      // Update UI
+      realitiesDisplay.textContent = realities.toFixed(2);
+      rpsDisplay.textContent = realitiesPerSecond.toFixed(2);
+      dotsDisplay.textContent = dots;
+      dotBoostDisplay.textContent = dotBoost.toFixed(2);
+
+      // Update Upgrade Button
+      if (realities >= upgradeCosts["boostRealities"]) {
+        boostRealitiesButton.disabled = false;
+        boostRealitiesButton.textContent = "Boost Realities (" + upgradeCosts["boostRealities"] + ")";
+      } else {
+        boostRealitiesButton.disabled = true;
+        boostRealitiesButton.textContent = "Not Enough Realities";
+      }
+    }, 1);
+
+    // Upgrade Functions
+    function boostRealities() {
+      if (realities >= upgradeCosts["boostRealities"]) {
+        realities -= upgradeCosts["boostRealities"];
+        dotBoost += 0.05;
+        dots++;
+        updateUpgradeButton();
+      }
+    }
+
+    // UI Update Functions
+    function updateUpgradeButton() {
+      // Update the button's visibility and cost display based on available realities
+      if (realities >= upgradeCosts["boostRealities"]) {
+        boostRealitiesButton.disabled = false;
+        boostRealitiesButton.textContent = "Boost Realities (" + upgradeCosts["boostRealities"] + ")";
+      } else {
+        boostRealitiesButton.disabled = true;
+        boostRealitiesButton.textContent = "Not Enough Realities";
+      }
+    }
+
+    // Event Listeners
+    boostRealitiesButton.addEventListener("click", boostRealities);
+  </script>
+</body>
+</html>
