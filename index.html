@@ -29,6 +29,7 @@
     <h2>Dots</h2>
     <div>Dots: <span id="dots">0</span></div>
     <div>Dots Boost: <span id="dotBoost">1</span></div>
+    <button class="upgrade-button" id="exponentDots">Exponent Dots (10 Dots, 50 Realities)</button>
   </div>
 
   <button class="upgrade-button" id="boostRealities">Boost Realities (15)</button>
@@ -39,10 +40,15 @@
     let realitiesPerSecond = 0;
     let dots = 0;
     let dotBoost = 1;
+    let exponentDots = 1; // Exponent for Dots boost
 
     // Upgrade Costs
     const upgradeCosts = {
       "boostRealities": 15,
+      "exponentDots": {
+        "dots": 10,
+        "realities": 50
+      }
     };
 
     // UI Elements
@@ -51,11 +57,12 @@
     const dotsDisplay = document.getElementById("dots");
     const dotBoostDisplay = document.getElementById("dotBoost");
     const boostRealitiesButton = document.getElementById("boostRealities");
+    const exponentDotsButton = document.getElementById("exponentDots");
 
     // Game Loop (runs every 1ms)
     setInterval(() => {
       // Generate Realities
-      realities += 0.01;
+      realities += 0.01 * dotBoost ** exponentDots; // Apply exponent boost
       realitiesPerSecond = realities * 1000;
 
       // Update UI
@@ -64,14 +71,9 @@
       dotsDisplay.textContent = dots;
       dotBoostDisplay.textContent = dotBoost.toFixed(2);
 
-      // Update Upgrade Button
-      if (realities >= upgradeCosts["boostRealities"]) {
-        boostRealitiesButton.disabled = false;
-        boostRealitiesButton.textContent = "Boost Realities (" + upgradeCosts["boostRealities"] + ")";
-      } else {
-        boostRealitiesButton.disabled = true;
-        boostRealitiesButton.textContent = "Not Enough Realities";
-      }
+      // Update Upgrade Buttons
+      updateUpgradeButton("boostRealities");
+      updateUpgradeButton("exponentDots");
     }, 1);
 
     // Upgrade Functions
@@ -80,24 +82,50 @@
         realities -= upgradeCosts["boostRealities"];
         dotBoost += 0.05;
         dots++;
-        updateUpgradeButton();
+        updateUpgradeButton("boostRealities");
+      }
+    }
+
+    function exponentDots() {
+      if (dots >= upgradeCosts["exponentDots"]["dots"] && realities >= upgradeCosts["exponentDots"]["realities"]) {
+        dots -= upgradeCosts["exponentDots"]["dots"];
+        realities -= upgradeCosts["exponentDots"]["realities"];
+        exponentDots += 0.25;
+        updateUpgradeButton("exponentDots");
       }
     }
 
     // UI Update Functions
-    function updateUpgradeButton() {
-      // Update the button's visibility and cost display based on available realities
-      if (realities >= upgradeCosts["boostRealities"]) {
-        boostRealitiesButton.disabled = false;
-        boostRealitiesButton.textContent = "Boost Realities (" + upgradeCosts["boostRealities"] + ")";
+    function updateUpgradeButton(upgradeName) {
+      const button = document.getElementById(upgradeName);
+      const cost = upgradeCosts[upgradeName];
+
+      if (upgradeName === "exponentDots") {
+        if (dots >= cost["dots"] && realities >= cost["realities"]) {
+          button.disabled = false;
+          button.textContent = "Exponent Dots (" + cost["dots"] + " Dots, " + cost["realities"] + " Realities)";
+        } else {
+          button.disabled = true;
+          if (dots < cost["dots"]) {
+            button.textContent = "Not Enough Dots";
+          } else {
+            button.textContent = "Not Enough Realities";
+          }
+        }
       } else {
-        boostRealitiesButton.disabled = true;
-        boostRealitiesButton.textContent = "Not Enough Realities";
+        if (realities >= cost) {
+          button.disabled = false;
+          button.textContent = "Boost Realities (" + cost + ")";
+        } else {
+          button.disabled = true;
+          button.textContent = "Not Enough Realities";
+        }
       }
     }
 
     // Event Listeners
     boostRealitiesButton.addEventListener("click", boostRealities);
+    exponentDotsButton.addEventListener("click", exponentDots);
   </script>
 </body>
 </html>
